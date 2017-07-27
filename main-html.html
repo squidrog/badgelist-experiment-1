@@ -12,16 +12,33 @@
 
 
 		<script type="text/javascript">
-			function get_pending_feedback(name) {
-				// body...
+			
+			function getPendingFeedback() {
+				var listOfUsers = [];
+				/* code that gets users in the group and adds each to listOfUsers
+				...
+				*/
+				var groupUrl = document.getElementById("input").value;
+
+				// setting contents of textarea, not useful right now
+				document.getElementById("outputArea").value= groupUrl + "\n" + groupUrl;
 			}
 		</script>
-		
 
-		<div id="center">
-			<!-- has no effect yet-->
-			<button type="button"
-			onclick=">Search For Pending Feedback</button> 
+		<!--the box for the user to paste the url of the group-->
+		<div id="inputField">
+			<input type="text" id="input" value="Group Url">
 		</div>
 
+		<!--button calls javascript function-->
+		<div id="center">
+			<button onclick="getPendingFeedback()">Click</button>
+		</div>
+
+		<!--output textarea for links to all feedback requests-->
+		<div id=output>
+			<textarea id="outputArea" rows="10" cols="70" class="textAreaFormat">Feedback Requests</textarea>
+		</div>
+			
+		</body>
 </html>
