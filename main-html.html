@@ -10,20 +10,43 @@
 			<p>*instructions to be added*</p>
 		</div>
 
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
 
 		<script type="text/javascript">
 			
 			function getPendingFeedback() {
-				var listOfUsers = [];
-				/* code that gets users in the group and adds each to listOfUsers
-				...
-				*/
-				var groupUrl = document.getElementById("input").value;
+				var listOfBadges = [];
+				
+				var groupUrl = document.getElementById("input").value + ".json";
+
+				
+				// disables asynchronous in ajax so that the rest of the function works correctly. can be turned  back on using:
+				/*
+				$.ajaxSetup({
+        			async: true
+    			});
+    			*/
+				$.ajaxSetup({
+					async: false
+				});
+
+				//chrome does not allow xmlhttprequest to a different domain than the page is on so this will not work in chrome
+				$.getJSON('https://www.badgelist.com/community.json', function(data) {
+					console.log(data);
+					listOfBadges = data.badges;
+					console.log(listOfBadges);
+				});
 
 				// setting contents of textarea, not useful right now
 				document.getElementById("outputArea").value= groupUrl + "\n" + groupUrl;
+
+				console.log(listOfBadges);
 			}
+
+
 		</script>
+
 
 		<!--the box for the user to paste the url of the group-->
 		<div id="inputField">
