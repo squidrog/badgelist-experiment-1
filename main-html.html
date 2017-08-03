@@ -1,80 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 	<head>
-		<link href="style.css" rel="stylesheet" type="text/css">
 		<title>badgelist-experiment-1</title>
+
+		<link href="style.css" rel="stylesheet" type="text/css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	</head>
+
 	<body>
+	
 		<div id="instructions">
 			<h3>Instructions:</h3>
 			<p>*instructions to be added*</p>
 		</div>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-
-		<script type="text/javascript">
-			
-			function getPendingFeedback() {
-				var listOfBadges = [];
-
-				var finalOutputString = "";
-				
-				var groupUrl = document.getElementById("input").value;
-
-				
-				// disables asynchronous in ajax so that the rest of the function works correctly. can be turned  back on using:
-				/*
-				$.ajaxSetup({
-        			async: true
-    			});
-    			*/
-				$.ajaxSetup({
-					async: false
-				});
-
-				//chrome does not allow xmlhttprequest to a different domain than the page is on so this will not work in chrome
-				//retrieves and saves the list of badges in the group
-				$.getJSON(groupUrl + ".json", function(data) {
-					console.log(data);
-					listOfBadges = data.badges;
-					console.log(listOfBadges);
-				});
-				
-				for (var i = 0; i < listOfBadges.length; i++){
-					//saves the current badge to the output string
-					var listOfLearners = [];
-
-
-					//retrieves and saves the ids of learners of the current badge
-					$.getJSON(groupUrl + "/" + listOfBadges[i] + ".json" , function(data) {
-						listOfLearners = data.learners;
-					});
-
-					for (var j = 0; j < listOfLearners.length; j++){
-
-						//retrieves the validation status of the learner and if feedback is requested saves the url of their badge profile to the output string
-						$.getJSON(groupUrl + "/" + listOfBadges[i] + "/u/" + listOfLearners[j] + ".json" , function(data) {
-
-							if (data.validation_status == "requested"){
-								finalOutputString = finalOutputString + groupUrl + "/" + listOfBadges[i] + "/u/" + listOfLearners[j] + "\n";
-							}
-						});
-
-					}
-
-				}
-				
-				document.getElementById("outputArea").value = finalOutputString;
-			}
-
-
-		</script>
-
-
 		<!--the box for the user to paste the url of the group-->
 		<div id="inputField">
-			<input type="text" id="input" value="Group Url">
+			<label for="groupUrl">Group URL</label>
+			<input type="text" id="groupUrl" value="community">
+			<p class="infoText">
+				Enter the the unique part of the group's url.
+			</p>
 		</div>
 
 		<!--button calls javascript function-->
@@ -86,6 +34,58 @@
 		<div id=output>
 			<textarea id="outputArea" rows="10" cols="70" class="textAreaFormat">Feedback Requests</textarea>
 		</div>
+
 			
-		</body>
+	</body>
+
+	<script type="text/javascript">
+
+		var group = {};
+		var badges = {}; // fullBadgeUrl => badgeObject
+		var logs = {}; // fullBadgeUrl => userId => logObject
+		var pendingRequests = 0;
+		var allRequestsSent = false;
+		
+		function getPendingFeedback() {
+			var listOfBadges = [];
+			var finalOutputString = "";
+			var groupUrl = document.getElementById("groupUrl").value;
+
+			if (!groupUrl.includes('/')) groupUrl = 'https://www.badgelist.com/' + groupUrl;
+
+			//chrome does not allow xmlhttprequest to a different domain than the page is on so this will not work in chrome
+			//retrieves and saves the list of badges in the group
+			$.getJSON(groupUrl + ".json", function(groupResponse) {
+				group = groupResponse;
+				console.log(groupResponse);
+
+				for (var i = 0; i < group.badges.length; i++) {
+					//retrieves and saves the ids of learners of the current badge
+					$.getJSON(groupUrl + "/" + group.badges[i] + ".json" , function(badgeResponse) {
+						badges[badgeResponse.full_url.toLowerCase() + '.json'] = badgeResponse;
+						logs[badgeResponse.full_url.toLowerCase() + '.json'] = {};
+
+						for (var j = 0; j < badgeResponse.learners.length; j++){
+							pendingRequests++;
+							
+							$.getJSON(badgeResponse.full_url + "/u/" + badgeResponse.learners[j] + ".json" , function(logResponse) {
+								var urlParts = logResponse.evidence.split('/');
+								logs[logResponse.badge][urlParts[urlParts.length - 1]] = logResponse;
+								
+								pendingRequests--;
+
+								if (allRequestsSent && (pendingRequests == 0))
+									console.log('Done!');
+							});
+						}
+					});
+				}
+
+				allRequestsSent = true;
+			});
+			
+		}
+
+
+	</script>
 </html>

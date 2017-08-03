@@ -1,0 +1,11 @@
+# Ignore all logfiles and tempfiles.
+*.swp
+*~
+.project
+.DS_store
+.idea
+.secret
+
+# Ignore sublime-related files
+*.sublime-project
+*.sublime-workspace
