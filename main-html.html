@@ -17,8 +17,10 @@
 			
 			function getPendingFeedback() {
 				var listOfBadges = [];
+
+				var finalOutputString = "";
 				
-				var groupUrl = document.getElementById("input").value + ".json";
+				var groupUrl = document.getElementById("input").value;
 
 				
 				// disables asynchronous in ajax so that the rest of the function works correctly. can be turned  back on using:
@@ -32,16 +34,38 @@
 				});
 
 				//chrome does not allow xmlhttprequest to a different domain than the page is on so this will not work in chrome
-				$.getJSON('https://www.badgelist.com/community.json', function(data) {
+				//retrieves and saves the list of badges in the group
+				$.getJSON(groupUrl + ".json", function(data) {
 					console.log(data);
 					listOfBadges = data.badges;
 					console.log(listOfBadges);
 				});
+				
+				for (var i = 0; i < listOfBadges.length; i++){
+					//saves the current badge to the output string
+					var listOfLearners = [];
 
-				// setting contents of textarea, not useful right now
-				document.getElementById("outputArea").value= groupUrl + "\n" + groupUrl;
 
-				console.log(listOfBadges);
+					//retrieves and saves the ids of learners of the current badge
+					$.getJSON(groupUrl + "/" + listOfBadges[i] + ".json" , function(data) {
+						listOfLearners = data.learners;
+					});
+
+					for (var j = 0; j < listOfLearners.length; j++){
+
+						//retrieves the validation status of the learner and if feedback is requested saves the url of their badge profile to the output string
+						$.getJSON(groupUrl + "/" + listOfBadges[i] + "/u/" + listOfLearners[j] + ".json" , function(data) {
+
+							if (data.validation_status == "requested"){
+								finalOutputString = finalOutputString + groupUrl + "/" + listOfBadges[i] + "/u/" + listOfLearners[j] + "\n";
+							}
+						});
+
+					}
+
+				}
+				
+				document.getElementById("outputArea").value = finalOutputString;
 			}
 
 
