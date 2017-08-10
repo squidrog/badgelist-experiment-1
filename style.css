@@ -105,11 +105,16 @@ a:active {
 	margin-left: 400px;
 }
 
-#output{
+#output {
 	position: absolute;
 	padding: 0 0 0 0; /*top right bottom left*/
 	margin-top: 180px;
 	margin-left: 400px;
+}
+
+.infoText {
+	position: relative;
+	left: 270px;
 }
 
 .textAreaFormat {

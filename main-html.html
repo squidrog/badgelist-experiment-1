@@ -13,7 +13,7 @@
 	
 		<div id="instructions">
 			<h3>Instructions:</h3>
-			<p>*instructions to be added*</p>
+			<p>Use the small textbox to search for pending feedback requests from the input group</p>
 		</div>
 
 		<!--the box for the user to paste the url of the group-->
@@ -27,12 +27,12 @@
 
 		<!--button calls javascript function-->
 		<div id="center">
-			<button onclick="getPendingFeedback()">Click</button>
+			<button onclick="getPendingFeedback()">Get Pending Feedback Requests</button>
 		</div>
 
 		<!--output textarea for links to all feedback requests-->
 		<div id=output>
-			<textarea id="outputArea" rows="10" cols="70" class="textAreaFormat">Feedback Requests</textarea>
+			<textarea id="outputArea" rows="10" cols="70" class="textAreaFormat"></textarea>
 		</div>
 
 			
@@ -51,7 +51,7 @@
 			var finalOutputString = "";
 			var groupUrl = document.getElementById("groupUrl").value;
 
-			if (!groupUrl.includes('/')) groupUrl = 'https://www.badgelist.com/' + groupUrl;
+			if (groupUrl.indexOf('/') == -1) groupUrl = 'https://www.badgelist.com/' + groupUrl;
 
 			//chrome does not allow xmlhttprequest to a different domain than the page is on so this will not work in chrome
 			//retrieves and saves the list of badges in the group
@@ -74,8 +74,19 @@
 								
 								pendingRequests--;
 
-								if (allRequestsSent && (pendingRequests == 0))
+								if (allRequestsSent && (pendingRequests == 0)){
 									console.log('Done!');
+									$.each(logs, function(badgeUrl, userNames){
+										$.each(userNames, function(users, userProfile){
+											console.log(userProfile);
+											if (userProfile.validation_status == 'requested'){
+												finalOutputString = finalOutputString + userProfile.evidence + "\n";
+											}
+										})
+									})
+									document.getElementById("outputArea").value = finalOutputString;
+								}
+									
 							});
 						}
 					});
