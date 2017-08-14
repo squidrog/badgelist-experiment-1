@@ -4,37 +4,174 @@
 	<head>
 		<title>badgelist-experiment-1</title>
 
-		<link href="style.css" rel="stylesheet" type="text/css">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<style type="text/css">
+
+			/*** BASE STYLES ***/
+			 
+				body {
+					font-family: 'helvetica neue', helvetica, 'sans serif';
+					font-size: 14px;
+					color: #333333;
+					background-color: #F9F9F9;
+				}
+				 
+				p {
+					width: 80%;
+				}
+				 
+				li {
+					list-style-type: none;
+					line-height: 150%;
+					list-style-image: url(../images/arrowSmall.gif);
+				}
+				 
+				h1 {
+					font-family: Georgia, "Times New Roman", Times, serif;
+					font-size: 18px;
+					font-weight: bold;
+					color: #000000;
+				}
+				 
+				h2 {
+					font-family: Georgia, "Times New Roman", Times, serif;
+					font-size: 16px;
+					font-weight: bold;
+					color: #000000;
+					border-bottom: 1px solid #C6EC8C;
+				}
+				 
+				a:link {
+					color: #00CC00;
+					text-decoration: underline;
+					font-weight: bold;
+				}
+				 
+				li :link {
+					color: #00CC00;
+					text-decoration: none;
+					font-weight: bold;
+				}
+				 
+				a:visited {
+					color: #00CC00;
+					text-decoration: underline;
+					font-weight: bold;
+				}
+				 
+				li a:visited {
+					color: #00CC00;
+					text-decoration: none;
+					font-weight: bold;
+				}
+				 
+				a:hover {
+					color: rgb(0, 96, 255);
+					padding-bottom: 5px;
+					font-weight: bold;
+					text-decoration: underline;
+				}
+				 
+				li a:hover {
+					display: block;
+					color: rgb(0, 96, 255);
+					padding-bottom: 5px;
+					font-weight: bold;
+					border-bottom-width: 1px;
+					border-bottom-style: solid;
+					border-bottom-color: #C6EC8C;
+				}
+				 
+				a:active {
+					color: rgb(255, 0, 102);
+					font-weight: bold;
+				}
+
+			/*** PAGE CONTENT ***/
+
+				#container {
+					display: flex;
+					flex-direction: row;
+					flex-wrap: wrap;
+				}
+				
+					#instructionPanel {
+						margin: 0;
+						font-weight: normal;
+						flex: 1 1 4em;
+						padding: 2em;
+						z-index: 2;
+
+						background: #FB8C00;
+						color: white;
+						box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+					}
+
+					#interactionPanel {
+						flex: 1 1 auto;
+						padding: 2em;
+						background: white;
+						color: #212121;
+						z-index: 1;
+						max-width: 900px;
+					}
+
+						#inputField {
+						}
+
+						#center {
+						}
+
+						#output {
+						}
+
+						.infoText {
+						}
+
+						.textAreaFormat {
+							font-family:Verdana; 
+							font-size:13px; 
+							background-color: #f8ecf2
+						}
+
+		</style>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	</head>
 
 	<body>
-	
-		<div id="instructions">
-			<h3>Instructions:</h3>
-			<p>Use the small textbox to search for pending feedback requests from the input group</p>
-		</div>
 
-		<!--the box for the user to paste the url of the group-->
-		<div id="inputField">
-			<label for="groupUrl">Group URL</label>
-			<input type="text" id="groupUrl" value="community">
-			<p class="infoText">
-				Enter the the unique part of the group's url.
-			</p>
-		</div>
+		<div id="container">
+			
+			<div id="instructionPanel">
+				<h3>Instructions:</h3>
+				<p>Use the small textbox to search for pending feedback requests from the input group</p>
+			</div>
 
-		<!--button calls javascript function-->
-		<div id="center">
-			<button onclick="getPendingFeedback()">Get Pending Feedback Requests</button>
-		</div>
+			<div id="interactionPanel">
+				<!--the box for the user to paste the url of the group-->
+				<div id="inputField">
+					<label for="groupUrl">Group URL</label>
+					<input type="text" id="groupUrl" value="community">
+					<p class="infoText">
+						Enter the the unique part of the group's url.
+					</p>
+				</div>
 
-		<!--output textarea for links to all feedback requests-->
-		<div id=output>
-			<textarea id="outputArea" rows="10" cols="70" class="textAreaFormat"></textarea>
-		</div>
+				<!--button calls javascript function-->
+				<div id="center">
+					<button onclick="getPendingFeedback()">Get Pending Feedback Requests</button>
+				</div>
 
+				<!--output textarea for links to all feedback requests-->
+				<div id="outputWrapper">
+					<ul id="output">
+					</ul>
+				</div>
+			</div>
+			
+		</div>
 			
 	</body>
 
@@ -76,17 +213,23 @@
 
 								if (allRequestsSent && (pendingRequests == 0)){
 									console.log('Done!');
+
+									// Query each of the user profiles so we can get their names
+
+
+									// Finally loop through the logs and build out the output
 									$.each(logs, function(badgeUrl, userNames){
 										$.each(userNames, function(users, userProfile){
 											console.log(userProfile);
 											if (userProfile.validation_status == 'requested'){
-												finalOutputString = finalOutputString + userProfile.evidence + "\n";
+												$("#output").append("<li><a href='" + userProfile.evidence 
+													+ "' target='_blank'>"
+													+ userProfile.evidence + "</a></li>");
+												// FIXME : Make it so that the text inside of the anchor tag is "Badge Name - User Name"
 											}
 										})
 									})
-									document.getElementById("outputArea").value = finalOutputString;
 								}
-									
 							});
 						}
 					});
