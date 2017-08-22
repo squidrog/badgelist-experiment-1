@@ -176,7 +176,6 @@
 			//retrieves and saves the list of badges in the group
 			$.getJSON(groupUrl + ".json", function(groupResponse) {
 				group = groupResponse;
-				console.log(groupResponse);
 
 				for (var i = 0; i < group.badges.length; i++) {
 					//retrieves and saves the ids of learners of the current badge
@@ -193,9 +192,7 @@
 								
 								pendingRequests--;
 
-								if (allRequestsSent && (pendingRequests == 0)){
-									console.log('Done!');
-
+								if (allRequestsSent && (pendingRequests == 0)){;
 									// Query each of the user profiles so we can get their names
 
 
@@ -204,8 +201,10 @@
 										$.each(userNames, function(users, userProfile){
 											console.log(userProfile);
 											if (userProfile.validation_status == 'requested'){
+												var badgeUrlParts = userProfile.evidence.split('/');
+												// the index of badgeUlrParts[badgeUrlParts.length -3] should never give an index out of bounds exception since there should always be suffiencet pieces of the evidence url.
 												$("#output").append("<li><a href='" + userProfile.evidence 
-													+ "' target='_blank'> BadgeName - "
+													+ "' target='_blank'>" +  badgeUrlParts[badgeUrlParts.length - 3] +" - "
 													+ users + "</a></li>");
 												// FIXME : Make it so that the text inside of the anchor tag is "Badge Name - User Name"
 											}
@@ -214,7 +213,7 @@
 								}
 							});
 						}
-					});
+					})
 				}
 
 				allRequestsSent = true;
